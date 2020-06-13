@@ -38,10 +38,22 @@ only in whether they include the line below the block or not.
 | `<count>ai`  | **A**n **I**ndentation level and line above.                |
 | `<count>ii`  | **I**nner **I**ndentation level (**no line above**).        |
 | `<count>aI`  | **A**n **I**ndentation level and lines above/below.         |
-| `<count>iI`  | **I**nner **I**ndentation level (**no lines above/below**). |
+| `<count>iI`  | **I**nner **I**ndentation level (current line and below).   |
 
-**Note:** the `iI` mapping is mostly included simply for completeness, it is
-effectively a synonym for `ii`.
+
+```python
+print('Hello World')       #                   _     _
+for n in range(1, 101):    #             _      |     |
+    response = ''          #              |     |     |             _
+    if not n%3:            #              |     |     |              |
+        response += 'Fizz' #              |     |     |     _        |
+    if not n%5:            # (cursor)  vii| vai | vaI | viI  | viIiI |
+        response += 'Buzz' #              |     |     |     _|      _|
+
+    print(response or n)   #             _|    _|     |
+print('Goodbye')           #                         _|
+print('World')             #
+```
 
 Just like regular text objects, these mappings can be used either with
 operators expecting a motion, such as `d` or `c`, as well as in visual mode.

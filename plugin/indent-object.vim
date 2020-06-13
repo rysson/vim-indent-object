@@ -113,7 +113,10 @@ function! <Sid>TextObject(inner, incbelow, vis, range, count)
 		" Search backward for the first line with less indent than the target
 		" indent (skipping blank lines).
 		let blnk = getline(l_1) =~ "^\\s*$"
-		while l_1 > 0 && (blnk || indent(l_1) >= idnt)
+		while l_1 > 0 && (blnk || indent(l_1) >= idnt) && !(a:inner && a:incbelow && new_vis)
+			if a:inner && a:incbelow && indent(l_1) == idnt
+				break
+			endif
 			if g:indent_object_except_first_level && idnt == 0 && blnk
 				break
 			endif
@@ -126,9 +129,14 @@ function! <Sid>TextObject(inner, incbelow, vis, range, count)
 
 		" Search forward for the first line with more indent than the target
 		" indent (skipping blank lines).
+		let in_inner = v:false
 		let line_cnt = line("$")
 		let blnk = getline(l2) =~ "^\\s*$"
 		while l2 <= line_cnt && (blnk || indent(l2) >= idnt)
+			if a:inner && a:incbelow && !in_inner && indent(l2) > idnt
+				let in_inner = v:true
+				let idnt += 1
+			endif
 			if g:indent_object_except_first_level && idnt == 0 && blnk
 				break
 			endif
@@ -143,7 +151,7 @@ function! <Sid>TextObject(inner, incbelow, vis, range, count)
 		" we are selecting an 'inner' object. Exclude the bottom unless are
 		" told to include it.
 		let idnt2 = max([indent(l_1), indent(l2)])
-		if indent(l_1) < idnt2 || a:inner
+		if indent(l_1) < idnt2 || (a:inner && !a:incbelow)
 			let l_1 = l_1o
 		endif
 		if indent(l2) < idnt2 || a:inner || !a:incbelow
